@@ -10,6 +10,11 @@ import React from 'react';
 import { keys } from 'lodash';
 import i18n from 'i18n-calypso';
 
+/**
+ * Style dependencies
+ */
+import './style.scss';
+
 const ALT_TEXT = {
 	alipay: 'Alipay',
 	amex: 'American Express',
