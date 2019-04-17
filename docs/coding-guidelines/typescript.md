@@ -49,19 +49,12 @@ Usually we can find more meaningful types or type aliases that better communicat
 <tr><th>Avoid</th><th>Prefer</th></tr>
 </thead>
 <tbody>
-<tr>
-<td>
-```
+<tr><td><pre><code>
 function getTitle( id: number ) {}
-```
-</td>
-<td>
-```
+</code></pre></td><td><pre><code>
 type PostId: number;
 
 function getTitle( id: PostId ) {}
-```
-</td>
-</tr>
+</code></pre></td></tr>
 </tbody>
 </table>
