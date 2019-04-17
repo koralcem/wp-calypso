@@ -51,12 +51,12 @@ Usually we can find more meaningful types or type aliases that better communicat
 <tbody>
 <tr>
 <td>
-```js
+```
 function getTitle( id: number ) {}
 ```
 </td>
 <td>
-```js
+```
 type PostId: number;
 
 function getTitle( id: PostId ) {}
