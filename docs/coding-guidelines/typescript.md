@@ -32,3 +32,36 @@ Graph built with [`typescript-dev-flow.dot`](./typescript-dev-flow.dot)
  - _Type only what is helpful_: TypeScript's inference engine is powerful and can usually infer type information
    from untyped JavaScript. Encode only as much in the annotation as is necessary to clear up ambiguities in the
    inferred types and also to communicate to other developers.
+ - _Types communicate intention to other developers (and to yourself)_: Consider the statements that your types make
+   and use more specific and complicated types when things are otherwise ambiguous. Give tolerance to weaker typings
+   when code is already clear. Remember to look at the types of what you write in your IDE to get an impression of
+   how the annotations are communicating the types and adjust if necessary.
+
+## Usage patterns
+
+### Primitive types
+
+Avoid primitive types when possible. These are `string`, `int`, `null`, `boolean`, etc…
+Usually we can find more meaningful types or type aliases that better communicate our expectations.
+
+<table>
+<thead>
+<tr><th>Avoid</th><th>Prefer</th></tr>
+</thead>
+<tbody>
+<tr>
+<td>
+```js
+function getTitle( id: number ) {}
+```
+</td>
+<td>
+```js
+type PostId: number;
+
+function getTitle( id: PostId ) {}
+```
+</td>
+</tr>
+</tbody>
+</table>
