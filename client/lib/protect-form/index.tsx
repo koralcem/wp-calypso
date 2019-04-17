@@ -63,7 +63,7 @@ export interface ProtectedFormProps {
  */
 export const protectForm = < P extends ProtectedFormProps >(
 	WrappedComponent: ComponentType< P >
-) =>
+): ComponentType< Subtract< P, ProtectedFormProps > > =>
 	class ProtectedFormComponent extends Component< Subtract< P, ProtectedFormProps > > {
 		markChanged = () => markChanged( this );
 		markSaved = () => markSaved( this );

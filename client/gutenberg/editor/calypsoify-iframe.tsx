@@ -43,10 +43,8 @@ interface Props {
 	postId: number;
 	postType: string;
 	pressThis: any;
-	siteAdminUrl: string;
+	siteAdminUrl: string | null;
 }
-
-type ConnectedProps = ReturnType< typeof mapStateToProps > & typeof mapDispatchToProps;
 
 interface State {
 	allowedTypes?: any;
@@ -103,7 +101,8 @@ class CalypsoifyIframe extends Component< Props & ConnectedProps & ProtectedForm
 			return;
 		}
 
-		const isValidOrigin = this.props.siteAdminUrl.indexOf( origin ) === 0;
+		const isValidOrigin =
+			this.props.siteAdminUrl && this.props.siteAdminUrl.indexOf( origin ) === 0;
 
 		if ( ! isValidOrigin ) {
 			return;
@@ -250,7 +249,7 @@ class CalypsoifyIframe extends Component< Props & ConnectedProps & ProtectedForm
 		}
 	};
 
-	closeMediaModal = ( media: { items: Array< Parameters< typeof mediaCalypsoToGutenberg > > } ) => {
+	closeMediaModal = ( media: { items: Parameters< typeof mediaCalypsoToGutenberg >[] } ) => {
 		if ( ! this.state.classicBlockEditorId && media && this.mediaSelectPort ) {
 			const { multiple } = this.state;
 			const formattedMedia = map( media.items, item => mediaCalypsoToGutenberg( item ) );
@@ -443,6 +442,8 @@ const mapDispatchToProps = {
 	startEditingPost,
 	trashPost,
 };
+
+type ConnectedProps = ReturnType< typeof mapStateToProps > & typeof mapDispatchToProps;
 
 export default connect(
 	mapStateToProps,

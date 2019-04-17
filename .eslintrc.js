@@ -16,7 +16,6 @@ module.exports = {
 		{
 			files: [ 'bin/**/*' ],
 			rules: {
-				'@typescript-eslint/no-var-requires': 0,
 				'import/no-nodejs-modules': 0,
 				'no-console': 0,
 				'no-process-exit': 0,
@@ -63,8 +62,11 @@ module.exports = {
 		},
 	},
 	rules: {
-		'@typescript-eslint/no-use-before-define': [ 'error', { functions: false } ],
+		'@typescript-eslint/explicit-function-return-type': 0,
+		'@typescript-eslint/explicit-member-accessibility': 0,
 		'@typescript-eslint/no-unused-vars': [ 'error', { ignoreRestSiblings: true } ],
+		'@typescript-eslint/no-use-before-define': [ 'error', { functions: false, typedefs: false } ],
+		'@typescript-eslint/no-var-requires': 0,
 
 		// REST API objects include underscores
 		camelcase: 0,
