@@ -37,6 +37,15 @@ Graph built with [`typescript-dev-flow.dot`](./typescript-dev-flow.dot)
    when code is already clear. Remember to look at the types of what you write in your IDE to get an impression of
    how the annotations are communicating the types and adjust if necessary.
 
+## Getting started with TypeScript
+
+If you see something you don't understand then try not to let it cause more trouble than it needs to.
+Reach out and ask for help if you are working in existing code.
+
+If you want to be writing TypeScript but don't know how then start by searching for a tutorial online
+and _make sure to read [the official documentation](https://www.typescriptlang.org/docs/home.html)_ as
+it can help walk you through the different concepts and features available in the language.
+
 ## Usage patterns
 
 ### Primitive types
@@ -45,14 +54,243 @@ Avoid primitive types when possible. These are `string`, `int`, `null`, `boolean
 Usually we can find more meaningful types or type aliases that better communicate our expectations.
 
 #### Avoid
-```js
+```ts
 function getTitle( id: number ) {}
 ```
 
 #### Prefer
-```js
-type PostId: number;
+```ts
+type PostId = number;
 
 function getTitle( id: PostId ) {}
 ```
 
+This can help someone who is looking at your code to differentiate between just supplying the right
+type of data and supplying _what you want_.
+
+---
+
+Because TypeScript infers most types don't feel obligated to add types to everthing, especially literal values.
+
+#### Avoid
+```ts
+const name: string = 'Calypso';
+const isDesktopBuild: boolean = false;
+const flags: string[] = [ 'cool/feature' ];
+```
+
+#### Prefer
+```ts
+const name = 'Calypso';
+const isDesktopBuild = false;
+const flags = [ 'cool/feature' ];
+```
+
+In these cases the type annotations add noise where the types are obvious to the reader and to the compiler.
+There's a caveat here for advanced users and that is that we sometimes need to add additional typing in order
+to prevent _widening_ of the types. The compiler will infer as specifically as it can but sometimes we have to
+tell it to go further. See the following example:
+
+#### Avoid
+```ts
+const LEFT = 'left';
+const RIGHT = 'right';
+
+const directions = [ left, right ]; // type here is `string[]`
+```
+
+#### Prefer
+```ts
+const LEFT = 'left' as const;
+const RIGHT = 'right' as const;
+
+const directions = [ left, right ]; // type here is `( 'left' | 'right' )[]`
+```
+
+By using `as const` we tell the compiler to be fully specific in its inference. The difference in the way
+this communicates is that as `string[]` we don't clue in consumers of this thing to the range of values
+they should be able to use. With `( 'left' | 'right' )[]` they can see clearly that only one of two possible
+values are valid.
+
+### `any` type
+
+In most TypeScript projects we generally want to prevent the use of the `any` type in order to cut out the
+opportunity for runtime bugs and misunderstandings. In Calypso, however, we're gradually adding types where
+they help out and we won't likely ever reach a fully-typed program.
+
+Because of that we're going to find the dreaded "implicit `any`" all over the place. The "implicit `any`"
+is a missing type annotation where the compiler can't infer anything about the type so it determines that
+there are no constraints on the type.
+
+While it's great to add types where we can we want to _avoid_ explicitly adding `any` unless we really mean to.
+If we add `any` in order to fulfill the principle of avoiding the implicit `any` then we'll end up making it
+harder down the line to find and refine those types - for now it's only adding noise to the code. That is,
+leave the warning in there so that in the future it will be easier to spot in an existing module.
+
+#### Avoid
+```diff
+- function addSuffix( base, suffix ) {
++ function addSuffix( base: any, suffix: any ): any {
+```
+
+#### Prefer
+Just let it be. 🎶
+
+#### Prefer more
+```diff
+- function addSuffix( base, suffix ) {
++ function addSuffix( base: string, suffix: string ) {
+```
+
+### Types of functions
+
+When the compiler is unable to provide a meaningful type inference for the return value or parameters of a
+function then we should add annotations to clear up the confusion. Otherwise we should rely on the features
+of the language to continue passing along its built-in type inference. We can do this with the mapped-type
+helpers.
+
+By relying on TypeScript's inference instead of hard-coding values we can keep the code flexible as our
+types actually do change and further prevent noise from superfluous annotations.
+
+In addition, we may be opening a can of worms if we try and force type annotations on a function that we're
+importing from another module. If we don't understand the types we're using but we want to increase the
+safety and clarity of code we're using we can _defer_ the additional typing work for the future while
+safeguarding the code we write _today_.
+
+#### Avoid
+```ts
+// in some-module
+function someFunction() { return ( input ) => `${ input }`; }
+
+// in this module
+import { someFunction } from 'some-module';
+
+function foo(): ( ( input: number ) => string ) {
+	return someFunction();
+}
+```
+
+#### Prefer
+```ts
+import { someFunction } from 'some-module';
+
+function foo(): ReturnType<typeof someFunction> {
+	return someFunction();
+}
+```
+
+#### Avoid
+```ts
+interface StateProps {
+	siteId: number;
+	name: string;
+}
+
+interface DispatchProps {
+	reset: () => boolean;
+}
+
+const mapStateToProps = ( state ): StateProps => {
+	return {
+		siteId: getSelectedSiteId( state ),
+		name: getSelectedName( state ),
+	}
+}
+
+const mapDispatchToProps: DispatchProps = { reset }
+
+type Props = ExternalProps & StateProps & DispatchProps;
+```
+
+#### Prefer
+```ts
+const mapStateToProps = ( state ) => {
+	return {
+		siteId: getSelectedSiteId( state ),
+		name: getSelectedName( state )
+	}
+}
+
+const mapDispatchToProps = { reset };
+
+type Props = ExternalProps & ReturnType<typeof mapStateToProps> & typeof mapDispatchToProps;
+```
+
+#### Avoid
+```ts
+const handleUpdate = ( { items }: { items: ( { name: string, count: number } )[] ) => {
+	items.forEach( doSomethingUnknown );
+}
+```
+
+#### Prefer
+```ts
+const handleUpdate = ( { items }: { items: Parameters<typeof doSomethingUnknown>[] } ) => {
+	items.forEach( doSomethingUnknown );
+}
+```
+
+### React Components<Props, State>
+
+The important thing to think about when typing props and state is what the types are communicating and how
+they might allow or prevent mistakes in their use. It may be tempting to list out all of our props in one
+big explicit interface but that's not always the best bet. Let's look at a few ways we can type our props.
+
+#### Avoid
+```ts
+interface Props {
+	isVisible: boolean;
+}
+
+const mapStateToProps = state => ( { siteId: getSelectedSiteId( state ) } );
+
+export class Thing<Props> { }
+
+export default connect( mapStateToProps )( Thing );
+```
+
+Why avoid this? There's no indication on the component that it also expects a `siteId`. If we import the unwrapped
+version of the component we won't know that it needs a `siteId` and we'll probably crash at runtime or in our tests.
+
+#### Avoid
+```ts
+interface Props {
+	isVisible: boolean;
+	siteId: number;
+}
+
+const mapStateToProps = state => ( { siteId: getSelectedSiteId( state ) } );
+
+export class Thing<Props> { }
+
+export default connect( mapStateToProps )( Thing );
+```
+
+Although safer this construction leaves something ambiguous. Our types are mashed together even though we can look
+at the code and know that there's a difference in the way we treat `isVisible` and `siteId`. Our types have _only_
+provided safety so let's _also_ let them communicate better.
+
+#### Prefer
+```ts
+interface ExternalProps {
+	isVisible: boolean;
+}
+
+const mapStateToProps = state => ( { siteId: getSelectedSiteId( state ) } );
+
+type ConnectedProps = ReturnType<typeof mapStateToProps>;
+
+export class Thing<ExternalProps & ConnectedProps> { }
+
+export default connect( mapStateToProps )( Thing );
+```
+
+In this final construction it's clear from our type annotations how we expect the different set of props to behave.
+Since we're relying on the inference of `mapStateToProps` instead of explicitly typing out the expectations we're
+also a bit more fluid in being able to change the connected props without breaking our safety.
+
+ ### Confusing patterns?
+ 
+ If you find yourself in a situation where it isn't clear how you should type or annotate your code please ask in
+ Slack or ask a question in a PR comment. The `@automattic/type-review` team can provide guidance and update this
+ document in such situations.
