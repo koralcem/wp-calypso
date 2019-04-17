@@ -44,17 +44,15 @@ Graph built with [`typescript-dev-flow.dot`](./typescript-dev-flow.dot)
 Avoid primitive types when possible. These are `string`, `int`, `null`, `boolean`, etc…
 Usually we can find more meaningful types or type aliases that better communicate our expectations.
 
-<table>
-<thead>
-<tr><th>Avoid</th><th>Prefer</th></tr>
-</thead>
-<tbody>
-<tr><td><pre><code>
+#### Avoid
+```js
 function getTitle( id: number ) {}
-</code></pre></td><td><pre><code>
+```
+
+#### Prefer
+```js
 type PostId: number;
 
 function getTitle( id: PostId ) {}
-</code></pre></td></tr>
-</tbody>
-</table>
+```
+
