@@ -266,21 +266,6 @@ jobs:
                     }
                   }'
 
-  build-full-site-editing:
-    <<: *defaults
-    parallelism: 1
-    steps:
-      - prepare
-      - run:
-          name: Build the Full Site Editing plugin and theme
-          command: |
-            npx lerna run build --scope='@automattic/full-site-editing'
-      - run:
-          name: Move the Full Site Editing plugin and theme into the artifacts
-          command: |
-            cp -r apps/full-site-editing/blank-theme apps/full-site-editing/full-site-editing-plugin $CIRCLE_ARTIFACTS/full-site-editing/
-      - store-artifacts-and-test-results
-
   build-notifications:
     <<: *defaults
     parallelism: 1
@@ -312,6 +297,21 @@ jobs:
           name: Build the block editor in WordPress.com integration utils package
           command: |
             npx lerna run build --scope='@automattic/wpcom-block-editor' -- -- --output-path=$CIRCLE_ARTIFACTS/wpcom-block-editor
+      - store-artifacts-and-test-results
+
+  build-full-site-editing:
+    <<: *defaults
+    parallelism: 1
+    steps:
+      - prepare
+      - run:
+          name: Build the Full Site Editing plugin and theme
+          command: |
+            npx lerna run build --scope='@automattic/full-site-editing'
+      - run:
+          name: Move the Full Site Editing plugin and theme into the artifacts
+          command: |
+            docker cp -a apps/full-site-editing/blank-theme apps/full-site-editing/full-site-editing-plugin $CIRCLE_ARTIFACTS/full-site-editing/
       - store-artifacts-and-test-results
 
   test-client:
