@@ -24,7 +24,7 @@
 		"build:theme": "NODE_ENV=production npm run theme",
 		"dev": "npm-run-all --parallel dev:*",
 		"build": "npm-run-all --parallel build:*",
-		"php": "rsync -armR --include='*/' --include='*.php' --exclude='*' *theme *plugin dist/",
+		"php": "cp -R *plugin *theme dist",
 		"ci": "rimraf dist && npm run build && npm run php"
 	},
 	"devDependencies": {
