@@ -19,6 +19,7 @@ references:
         "$CIRCLE_ARTIFACTS/notifications-panel" \
         "$CIRCLE_ARTIFACTS/translate"           \
         "$CIRCLE_ARTIFACTS/screenshots"         \
+        "$CIRCLE_ARTIFACTS/full-site-editing"   \
         "$CIRCLE_ARTIFACTS/wpcom-block-editor"  \
         "$CIRCLE_TEST_REPORTS/client"           \
         "$CIRCLE_TEST_REPORTS/eslint"           \
@@ -264,6 +265,21 @@ jobs:
                       "vcs_type": "github"
                     }
                   }'
+
+  build-full-site-editing:
+    <<: *defaults
+    parallelism: 1
+    steps:
+      - prepare
+      - run:
+        name: Build the Full Site Editing plugin and theme
+        command: |
+          npx lerna run build --scope='@automattic/full-site-editing'
+      - run:
+        name: Move the Full Site Editing plugin and theme into the artifacts
+        command: |
+          cp apps/full-site-editing/blank-theme apps/full-site-editing/blank-theme $CIRCLE_ARTIFACTS/full-site-editing/
+      - store-artifacts-and-test-results
 
   build-notifications:
     <<: *defaults
@@ -601,6 +617,9 @@ workflows:
           filters:
             branches:
               ignore: master
+      - build-full-site-editing:
+          requires:
+            - setup
       - build-notifications:
           requires:
             - setup
