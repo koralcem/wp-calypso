@@ -23,8 +23,7 @@
 		"dev:theme": "npm run theme",
 		"build:theme": "NODE_ENV=production npm run theme",
 		"dev": "npm-run-all --parallel dev:*",
-		"build": "npm-run-all --parallel build:*",
-		"build-ci": ""
+		"build": "npm-run-all --parallel build:*"
 	},
 	"devDependencies": {
 		"@automattic/calypso-build": "file:../../packages/calypso-build"
