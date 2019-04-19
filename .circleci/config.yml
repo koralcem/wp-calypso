@@ -278,7 +278,7 @@ jobs:
       - run:
           name: Move the Full Site Editing plugin and theme into the artifacts
           command: |
-            cp -r apps/full-site-editing/blank-theme apps/full-site-editing/blank-theme $CIRCLE_ARTIFACTS/full-site-editing/
+            cp -r apps/full-site-editing/blank-theme apps/full-site-editing/full-site-editing-plugin $CIRCLE_ARTIFACTS/full-site-editing/
       - store-artifacts-and-test-results
 
   build-notifications:
