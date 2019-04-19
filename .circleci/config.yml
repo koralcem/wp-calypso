@@ -308,7 +308,7 @@ jobs:
           name: Build the Full Site Editing plugin and theme
           command: |
             npx lerna run ci --scope='@automattic/full-site-editing'
-            cp -r apps/dist $CIRCLE_ARTIFACTS/full-site-editing/
+            cp -R apps/full-site-editing/dist $CIRCLE_ARTIFACTS/full-site-editing/
       - store-artifacts-and-test-results
 
   test-client:
