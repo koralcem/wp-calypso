@@ -24,7 +24,8 @@
 		"build:theme": "NODE_ENV=production npm run theme",
 		"dev": "npm-run-all --parallel dev:*",
 		"build": "npm-run-all --parallel build:*",
-		"ci": "rimraf dist && npm run build && find *theme *plugin -name '*.php' | cpio -pdm dist"
+		"php": "rsync -armR --include='*/' --include='*.php' --exclude='*' *theme *plugin dist/",
+		"ci": "rimraf dist && npm run build && npm run php"
 	},
 	"devDependencies": {
 		"@automattic/calypso-build": "file:../../packages/calypso-build"
